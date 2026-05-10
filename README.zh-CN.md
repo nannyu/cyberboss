@@ -243,6 +243,14 @@ CYBERBOSS_CODEX_MODEL=gemma4:26b-32k
 
 这个模板会把云端和本地启动逻辑收敛在同一个 command 里。切回云端 provider 时，清空 `CYBERBOSS_CODEX_MODEL_PROVIDER` 和 `CYBERBOSS_CODEX_MODEL`，然后重启共享桥接，让 Codex app-server 用新的 command 环境启动。
 
+本地 Codex 模型还需要 model metadata。如果 `CYBERBOSS_CODEX_MODEL` 指向的模型不在 Codex 内置 catalog 里，需要在 Codex home 里放一份模型 catalog，并在 `~/.codex/config.toml` 里引用：
+
+```toml
+model_catalog_json = "/绝对路径/.codex/local-models.json"
+```
+
+这份文件应基于你现有的 Codex model catalog 生成，再追加本地模型条目。每个本地模型条目至少要和实际模型 slug 对齐，并写清楚正确的 `context_window`、`max_context_window`、`input_modalities` 和 truncation policy。不要只保留本地模型而删掉云端模型条目。配置后用 `codex debug models` 验证；本地模型应该能被列出，并且不应再出现 fallback metadata 警告。
+
 当 `CYBERBOSS_RUNTIME=claudecode` 时，Cyberboss 会在当前工作区自动补写 `.mcp.json` 里的 `cyberboss_tools`，并在启动 Claude 时显式挂上这份 MCP 配置。Claude 能发现 Cyberboss project tools，靠的就是这条项目本地配置，而不是全局注册。
 
 ### 用户自己会用到的终端命令

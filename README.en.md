@@ -235,6 +235,14 @@ CYBERBOSS_CODEX_MODEL=gemma4:26b-32k
 
 The template keeps cloud and local startup behavior in one command. When you switch back to the cloud provider, clear `CYBERBOSS_CODEX_MODEL_PROVIDER` and `CYBERBOSS_CODEX_MODEL`, then restart the shared bridge so the Codex app-server is launched with the new command environment.
 
+Local Codex models also need model metadata. If `CYBERBOSS_CODEX_MODEL` points at a model that is not in Codex's built-in catalog, add a model catalog file in your Codex home and reference it from `~/.codex/config.toml`:
+
+```toml
+model_catalog_json = "/absolute/path/to/.codex/local-models.json"
+```
+
+Build that file from your existing Codex model catalog and add entries for your local model slugs, including the correct `context_window`, `max_context_window`, `input_modalities`, and truncation policy. Keep the cloud model entries in the catalog. Verify with `codex debug models`; Codex should list the local model and should not warn that it is using fallback metadata.
+
 When `CYBERBOSS_RUNTIME=claudecode`, Cyberboss also upserts a workspace-local `.mcp.json` entry for `cyberboss_tools` before starting Claude, and launches Claude with that MCP config explicitly attached. That is how Claude discovers the Cyberboss project tools without any global registration.
 
 ### Terminal commands for end users
